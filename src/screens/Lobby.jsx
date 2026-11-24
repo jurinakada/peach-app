@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { LOBBY_USERS, ME } from '../mockData'
+import { AI_PARTNER, LOBBY_USERS, ME } from '../mockData'
 import Avatar from '../components/Avatar'
 import CoinBadge from '../components/CoinBadge'
 
@@ -14,7 +14,15 @@ export default function Lobby() {
         <h1 className="wordmark">🍑 PEACH</h1>
         <CoinBadge />
       </header>
-      <p className="tagline">Learn a language, one bite at a time.</p>
+
+      <button className="ai-partner-card" onClick={() => navigate('/ai-partner')}>
+        <Avatar emoji={AI_PARTNER.emoji} color={AI_PARTNER.color} size={40} />
+        <div className="ai-partner-card-text">
+          <strong>Talk with your AI Partner</strong>
+          <span>Practice {AI_PARTNER.lang} any time, at your own speed</span>
+        </div>
+        <span className="ai-partner-card-arrow">›</span>
+      </button>
 
       <p className="lobby-sub">Tap someone to start chatting</p>
 

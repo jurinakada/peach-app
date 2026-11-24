@@ -76,13 +76,6 @@
   letter-spacing: -0.5px;
 }
 
-.tagline {
-  color: var(--ink-soft);
-  font-weight: 600;
-  font-size: 13px;
-  margin: 2px 0 10px;
-}
-
 .lobby-sub {
   color: var(--ink-soft);
   font-size: 13px;
@@ -161,6 +154,40 @@
 }
 
 /* ---------- lobby / room ---------- */
+
+.ai-partner-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin: 8px 0 14px;
+  text-align: left;
+}
+
+.ai-partner-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.ai-partner-card-text strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.ai-partner-card-text span {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.ai-partner-card-arrow {
+  font-size: 22px;
+  color: var(--ink-soft);
+}
 
 .room {
   position: relative;
@@ -246,11 +273,6 @@
 .onboarding-peach {
   font-size: 72px;
   margin: 8px 0;
-}
-
-.tagline.center {
-  text-align: center;
-  margin: 0 0 16px;
 }
 
 .dot-row {
@@ -446,6 +468,37 @@
   font-weight: 600;
   color: var(--ink-soft);
   font-style: italic;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 2px 16px;
+  border-top: 1px solid var(--card-border);
+}
+
+.chat-input-row input {
+  flex: 1;
+  border: 1px solid var(--card-border);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 14px;
+  outline: none;
+}
+
+.chat-input-row input:focus {
+  border-color: var(--accent);
+}
+
+.send-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
 }
 
 .mic-area {

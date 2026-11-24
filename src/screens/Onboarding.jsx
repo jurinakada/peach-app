@@ -29,7 +29,6 @@ function Splash({ onContinue }) {
         ))}
       </div>
       <div className="onboarding-peach">🍑</div>
-      <p className="tagline center">Learn a language, one bite at a time.</p>
       <div className="dot-row">
         <span className="dot active" />
         <span className="dot" />

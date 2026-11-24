@@ -117,11 +117,6 @@ export const SLANG_DICTIONARY = {
     explanation:
       'English slang meaning "okay" / "deal" / "for sure" — agreement, not an actual wager.',
   },
-  'otsukaresama': {
-    term: 'Otsukaresama (お疲れ様)',
-    explanation:
-      'Said to acknowledge someone\'s effort — roughly "good work" — used constantly at and after work in Japan, regardless of how tired anyone actually is.',
-  },
   'guay': {
     term: 'Guay',
     explanation:
@@ -129,111 +124,82 @@ export const SLANG_DICTIONARY = {
   },
 }
 
-// Each LOBBY_USERS contact is an AI conversation partner for their native
-// language — practice is a scripted back-and-forth, not free typing.
-// `topic` shows under the chat header. Each turn is either:
-//   { from: 'ai', text, translation, slang?: [dictionaryKey] }
-//   { from: 'me', text, pronunciation: { score, tip } }
-// `slang` keys are passed straight to explainText() — see ai/explain.js —
-// rather than scanned from text, since the dialogue itself is in-language.
+// Conversations with the four LOBBY_USERS contacts — real human chat partners
+// (HelloTalk-style). `topic` shows under the chat header. `slang` lists
+// dictionary keys present in `text` so the UI knows which messages get a
+// "✨ AI explains" chip — see ai/explain.js.
 export const CONVERSATIONS = {
   haruto: {
     topic: 'Weekend',
-    turns: [
-      { from: 'ai', text: '週末は何をしましたか?', translation: 'What did you do this weekend?' },
-      {
-        from: 'me',
-        text: '友達と飲み会に行きました。',
-        pronunciation: { score: 88, tip: "lengthen the long 'ō' in nomikai" },
-      },
-      { from: 'ai', text: 'いいですね!楽しかったですか?', translation: 'Nice! Was it fun?', slang: ['nomikai'] },
-      {
-        from: 'me',
-        text: 'はい、でも疲れました!',
-        pronunciation: { score: 94, tip: "soften the 'r' sound in tsukaremashita" },
-      },
-      {
-        from: 'ai',
-        text: 'お疲れ様でした!今度は週末にゆっくり休んでくださいね。',
-        translation: 'Otsukaresama! Next time, rest well on the weekend.',
-        slang: ['otsukaresama'],
-      },
+    messages: [
+      { from: 'them', text: 'Hey! Long time no chat 👋 How was your week?', slang: [] },
+      { from: 'them', text: 'I had a nomikai with my coworkers yesterday, I\'m so tired lol', slang: ['nomikai'] },
+      { from: 'me', text: 'Haha nice! What did you talk about?', slang: [] },
+      { from: 'them', text: 'Mostly work stuff. My boss kept saying "ganbatte" about the new project 😅', slang: ['ganbatte'] },
+      { from: 'them', text: 'Anyway, bet you had a chill week right?', slang: ['bet'] },
     ],
   },
   camille: {
     topic: 'School life',
-    turns: [
-      {
-        from: 'ai',
-        text: "C'est la rentrée ici, comment ça se passe pour toi?",
-        translation: "It's back-to-school time here, how's it going for you?",
-        slang: ['la rentrée'],
-      },
-      {
-        from: 'me',
-        text: "Ça va, mais j'ai beaucoup de devoirs.",
-        pronunciation: { score: 90, tip: "nasalize the 'en' in beaucoup" },
-      },
-      { from: 'ai', text: 'Courage! Tu vas y arriver.', translation: "Stay strong! You'll get there." },
-      {
-        from: 'me',
-        text: "Merci, j'espère!",
-        pronunciation: { score: 95, tip: "roll the 'r' softly in espère" },
-      },
-      {
-        from: 'ai',
-        text: 'On peut faire la bise demain si tu veux passer!',
-        translation: 'We can do la bise tomorrow if you want to stop by!',
-        slang: ['faire la bise'],
-      },
+    messages: [
+      { from: 'them', text: 'Salut! Ça va? 😊', slang: [] },
+      { from: 'them', text: 'C\'est la rentrée here, everyone is stressed at school', slang: ['la rentrée'] },
+      { from: 'me', text: 'Oh that sounds intense. What is that exactly?', slang: [] },
+      { from: 'them', text: 'My grandma still wants to faire la bise with everyone at family dinners haha', slang: ['faire la bise'] },
     ],
   },
   mateo: {
-    topic: 'Weekend',
-    turns: [
-      { from: 'ai', text: '¿Qué hiciste el fin de semana?', translation: 'What did you do on the weekend?' },
-      {
-        from: 'me',
-        text: 'Fui a la playa con mis amigos.',
-        pronunciation: { score: 92, tip: "soften the 'y' in playa" },
-      },
-      { from: 'ai', text: '¡Qué guay! ¿Nadaste?', translation: 'Nice! Did you swim?', slang: ['guay'] },
-      {
-        from: 'me',
-        text: 'Sí, el agua estaba perfecta.',
-        pronunciation: { score: 91, tip: "roll the double 'rr' sound — agua has none, careful not to add it" },
-      },
-      {
-        from: 'ai',
-        text: 'Después seguro tocó sobremesa con la familia, ¿no?',
-        translation: 'Afterwards you probably had sobremesa with the family, right?',
-        slang: ['sobremesa'],
-      },
+    topic: 'Daily routine',
+    messages: [
+      { from: 'them', text: 'Buenas! Watched the match yesterday? 🔥', slang: [] },
+      { from: 'them', text: 'After lunch I need my siesta, no cap', slang: ['siesta'] },
+      { from: 'them', text: 'Then sobremesa for like an hour with my family lol', slang: ['sobremesa'] },
+      { from: 'me', text: 'That sounds so relaxing honestly', slang: [] },
     ],
   },
   soojin: {
     topic: 'Family',
-    turns: [
-      { from: 'ai', text: '주말에 뭐 했어요?', translation: 'What did you do this weekend?' },
-      {
-        from: 'me',
-        text: '친구들이랑 영화 봤어요.',
-        pronunciation: { score: 89, tip: "shorten the 'eo' sound in yeonghwa" },
-      },
-      { from: 'ai', text: '재미있었어요?', translation: 'Was it fun?' },
-      {
-        from: 'me',
-        text: '네, 완전 잼있었어요!',
-        pronunciation: { score: 93, tip: 'soften the final syllable in jaemisseosseoyo' },
-      },
-      {
-        from: 'ai',
-        text: '완전 잼있었다니 진짜 짱이에요!',
-        translation: "That's awesome, totally the best!",
-        slang: ['jjang'],
-      },
+    messages: [
+      { from: 'them', text: 'Hii~ did you finish your homework yet?', slang: [] },
+      { from: 'them', text: 'My little sister is doing so much aegyo to get allowance money 😂', slang: ['aegyo'] },
+      { from: 'them', text: 'This new comeback is jjang btw, you have to listen', slang: ['jjang'] },
     ],
   },
+}
+
+// The ONE AI Partner — a single always-available conversation practice
+// partner (separate from the human LOBBY_USERS contacts above). Practice is
+// a scripted back-and-forth, not free typing. Each turn is either:
+//   { from: 'ai', text, translation, slang?: [dictionaryKey] }
+//   { from: 'me', text, pronunciation: { score, tip } }
+// `slang` keys are passed straight to explainText() — see ai/explain.js.
+export const AI_PARTNER = {
+  id: 'ai-partner',
+  lang: 'Spanish',
+  flag: '🇪🇸',
+  emoji: '🍑',
+  color: '#ffceb0',
+  topic: 'Weekend',
+  turns: [
+    { from: 'ai', text: '¿Qué hiciste el fin de semana?', translation: 'What did you do on the weekend?' },
+    {
+      from: 'me',
+      text: 'Fui a la playa con mis amigos.',
+      pronunciation: { score: 92, tip: "soften the 'y' in playa" },
+    },
+    { from: 'ai', text: '¡Qué guay! ¿Nadaste?', translation: 'Nice! Did you swim?', slang: ['guay'] },
+    {
+      from: 'me',
+      text: 'Sí, el agua estaba perfecta.',
+      pronunciation: { score: 91, tip: "roll the double 'rr' sound — agua has none, careful not to add it" },
+    },
+    {
+      from: 'ai',
+      text: 'Después seguro tocó sobremesa con la familia, ¿no?',
+      translation: 'Afterwards you probably had sobremesa with the family, right?',
+      slang: ['sobremesa'],
+    },
+  ],
 }
 
 // Team Battle: you + 2 teammates vs "Team Plum" on a timer, round by round.

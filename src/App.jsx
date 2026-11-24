@@ -5,6 +5,7 @@ import BottomNav from './components/BottomNav'
 import Onboarding from './screens/Onboarding'
 import Lobby from './screens/Lobby'
 import Chat from './screens/Chat'
+import AIPartner from './screens/AIPartner'
 import Battle from './screens/Battle'
 import Shop from './screens/Shop'
 import './App.css'
@@ -36,6 +37,7 @@ function AppShell() {
           <Routes>
             <Route path="/" element={<Lobby />} />
             <Route path="/chat/:userId" element={<Chat />} />
+            <Route path="/ai-partner" element={<AIPartner />} />
             <Route path="/battle" element={<Battle />} />
             <Route path="/shop" element={<Shop />} />
           </Routes>
