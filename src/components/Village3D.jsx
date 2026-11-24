@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
-import { LOBBY_USERS, ME } from '../mockData'
+import { CONVERSATIONS, LOBBY_USERS, ME } from '../mockData'
+import { detectSlang, explainText } from '../ai/explain'
 
 const WORLD_HALF_X = 9
 const WORLD_HALF_Z = 12
 const SPEED = 7
 const LABEL_HEIGHT = 2.05
+const SPEECH_HEIGHT = 2.9
+// How close you need to walk before you can start talking to someone — also
+// keeps the zoomed-in "talking" camera framing guaranteed to fit both of you.
+const TALK_RANGE = 4.5
 
 const TREES = [
   { x: -8, z: -10 }, { x: 8, z: -10.5 }, { x: -8.5, z: 1 }, { x: 8.5, z: 0.5 },
@@ -24,6 +29,10 @@ function clamp(value, min, max) {
 
 function toWorld(user) {
   return [(user.x / 100 - 0.5) * WORLD_HALF_X * 2, (user.y / 100 - 0.5) * WORLD_HALF_Z * 2]
+}
+
+function isInRange(posRef, x, z) {
+  return Math.hypot(x - posRef.current.x, z - posRef.current.z) <= TALK_RANGE
 }
 
 function useMoveInput() {
@@ -68,24 +77,26 @@ function Character({ color }) {
   )
 }
 
-function Player({ input, posRef }) {
+function Player({ input, posRef, frozen }) {
   const group = useRef()
   const [facing, setFacing] = useState(1)
 
   useFrame((_, delta) => {
-    let dx = 0
-    let dz = 0
-    if (input.current.up) dz -= 1
-    if (input.current.down) dz += 1
-    if (input.current.left) dx -= 1
-    if (input.current.right) dx += 1
-    const len = Math.hypot(dx, dz)
-    if (len > 0) {
-      dx /= len
-      dz /= len
-      posRef.current.x = clamp(posRef.current.x + dx * SPEED * delta, -WORLD_HALF_X + 0.8, WORLD_HALF_X - 0.8)
-      posRef.current.z = clamp(posRef.current.z + dz * SPEED * delta, -WORLD_HALF_Z + 0.8, WORLD_HALF_Z - 0.8)
-      if (dx !== 0) setFacing(dx > 0 ? 1 : -1)
+    if (!frozen) {
+      let dx = 0
+      let dz = 0
+      if (input.current.up) dz -= 1
+      if (input.current.down) dz += 1
+      if (input.current.left) dx -= 1
+      if (input.current.right) dx += 1
+      const len = Math.hypot(dx, dz)
+      if (len > 0) {
+        dx /= len
+        dz /= len
+        posRef.current.x = clamp(posRef.current.x + dx * SPEED * delta, -WORLD_HALF_X + 0.8, WORLD_HALF_X - 0.8)
+        posRef.current.z = clamp(posRef.current.z + dz * SPEED * delta, -WORLD_HALF_Z + 0.8, WORLD_HALF_Z - 0.8)
+        if (dx !== 0) setFacing(dx > 0 ? 1 : -1)
+      }
     }
     if (group.current) {
       group.current.position.set(posRef.current.x, 0, posRef.current.z)
@@ -101,10 +112,15 @@ function Player({ input, posRef }) {
   )
 }
 
-function Villager({ user, onTalk }) {
+function Villager({ user, onTalk, posRef }) {
   const [x, z] = toWorld(user)
   return (
-    <group position={[x, 0, z]} onClick={() => onTalk(user.id)}>
+    <group
+      position={[x, 0, z]}
+      onClick={() => {
+        if (isInRange(posRef, x, z)) onTalk(user.id)
+      }}
+    >
       <Character color={user.color} />
     </group>
   )
@@ -134,74 +150,137 @@ function Flower({ x, z, color }) {
   )
 }
 
-function CameraRig({ posRef }) {
+// Chases the player normally; when talkTargetRef has a world position, it
+// instead zooms in to frame the player + whoever they're talking to.
+function CameraRig({ posRef, talkTargetRef }) {
   useFrame(({ camera }) => {
-    const targetX = posRef.current.x
-    const targetZ = posRef.current.z + 15
+    const talkTarget = talkTargetRef.current
+    let targetX
+    let targetZ
+    let targetY
+    let lookX
+    let lookZ
+    let lookY
+
+    if (talkTarget) {
+      const midX = (posRef.current.x + talkTarget.x) / 2
+      const midZ = (posRef.current.z + talkTarget.z) / 2
+      targetX = midX
+      targetZ = midZ + 5
+      targetY = 5.5
+      lookX = midX
+      lookZ = midZ
+      lookY = 1.3
+    } else {
+      targetX = posRef.current.x
+      targetZ = posRef.current.z + 15
+      targetY = 15
+      lookX = posRef.current.x
+      lookZ = posRef.current.z
+      lookY = 0.8
+    }
+
     const dx = targetX - camera.position.x
     const dz = targetZ - camera.position.z
+    const dy = targetY - camera.position.y
     // Snap once close enough so the camera settles to an exact, stable
     // value instead of an asymptotic lerp nudging by sub-pixel amounts
-    // forever (which also kept the label overlay below recomputing).
+    // forever (which also kept the overlay projections below recomputing).
     camera.position.x = Math.abs(dx) > 0.01 ? camera.position.x + dx * 0.08 : targetX
     camera.position.z = Math.abs(dz) > 0.01 ? camera.position.z + dz * 0.08 : targetZ
-    camera.position.y = 15
-    camera.lookAt(posRef.current.x, 0.8, posRef.current.z)
+    camera.position.y = Math.abs(dy) > 0.01 ? camera.position.y + dy * 0.08 : targetY
+    camera.lookAt(lookX, lookY, lookZ)
   })
   return null
 }
 
-// Projects each character's world position to screen pixels every frame and
-// writes it straight to the label <div>'s style (via labelRefs), bypassing
-// React state so this costs nothing per frame. Avoids drei's <Html>, which
-// has a known bug where one of several simultaneous instances can silently
-// fail to mount its DOM portal.
-function LabelProjector({ posRef, labelRefs }) {
+// Projects world positions to screen pixels every frame and writes them
+// straight to each DOM node's style (via the ref maps passed in), bypassing
+// React state so this costs nothing per frame. This also avoids drei's
+// <Html>, which has a known bug where one of several simultaneous instances
+// can silently fail to mount its DOM portal.
+function SceneProjector({ posRef, labelRefs, talkTargetRef, speechRefs }) {
   const vec = useMemo(() => new Vector3(), [])
 
   useFrame(({ camera, size }) => {
-    project(labelRefs.current.me, posRef.current.x, posRef.current.z, camera, size, vec)
+    project(labelRefs.current.me, posRef.current.x, posRef.current.z, LABEL_HEIGHT, camera, size, vec)
     for (const user of LOBBY_USERS) {
       const [x, z] = toWorld(user)
-      project(labelRefs.current[user.id], x, z, camera, size, vec)
+      project(labelRefs.current[user.id], x, z, LABEL_HEIGHT, camera, size, vec)
+      const label = labelRefs.current[user.id]
+      if (label) label.classList.toggle('in-range', isInRange(posRef, x, z))
+    }
+
+    const talkTarget = talkTargetRef.current
+    if (talkTarget) {
+      // Clamped so a speech bubble near the edge of frame doesn't overflow
+      // past the rounded, overflow-hidden canvas container and get clipped.
+      project(speechRefs.current.me, posRef.current.x, posRef.current.z, SPEECH_HEIGHT, camera, size, vec, 95)
+      project(speechRefs.current.them, talkTarget.x, talkTarget.z, SPEECH_HEIGHT, camera, size, vec, 95)
     }
   })
 
   return null
 }
 
-function project(el, x, z, camera, size, vec) {
+function project(el, x, z, height, camera, size, vec, horizontalMargin = 0) {
   if (!el) return
-  vec.set(x, LABEL_HEIGHT, z)
+  vec.set(x, height, z)
   vec.project(camera)
   if (vec.z > 1) {
     el.style.display = 'none'
     return
   }
   el.style.display = ''
-  const px = (vec.x * 0.5 + 0.5) * size.width
+  let px = (vec.x * 0.5 + 0.5) * size.width
   const py = (-vec.y * 0.5 + 0.5) * size.height
-  el.style.transform = `translate(-50%, -50%) translate(${px}px, ${py}px)`
+  if (horizontalMargin) {
+    px = clamp(px, horizontalMargin, size.width - horizontalMargin)
+  }
+  el.style.transform = `translate(-50%, -100%) translate(${px}px, ${py}px)`
 }
 
-function LabelOverlay({ labelRefs, onTalk }) {
+function LabelOverlay({ labelRefs, onTalk, posRef }) {
   return (
     <div className="labels-overlay">
       <div ref={(el) => (labelRefs.current.me = el)} className="room-name label-chip">
         {ME.emoji} You
       </div>
-      {LOBBY_USERS.map((user) => (
-        <div
-          key={user.id}
-          ref={(el) => (labelRefs.current[user.id] = el)}
-          className="room-name label-chip"
-          style={{ cursor: 'pointer' }}
-          onClick={() => onTalk(user.id)}
-        >
-          {user.emoji} {user.flag} {user.name}
-        </div>
-      ))}
+      {LOBBY_USERS.map((user) => {
+        const [x, z] = toWorld(user)
+        return (
+          <div
+            key={user.id}
+            ref={(el) => (labelRefs.current[user.id] = el)}
+            className="room-name label-chip"
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              if (isInRange(posRef, x, z)) onTalk(user.id)
+            }}
+          >
+            {user.emoji} {user.flag} {user.name}
+          </div>
+        )
+      })}
     </div>
+  )
+}
+
+// Live, in-world dialogue: a speech bubble floats above whoever is
+// "speaking" right now (positioned by SceneProjector) instead of a chat
+// transcript panel. Their lines play on their own; yours wait for the mic.
+function SpeechBubbles({ speechRefs, talkingUser, currentMessage }) {
+  if (!talkingUser) return null
+  const isThem = currentMessage?.from === 'them'
+  return (
+    <>
+      <div ref={(el) => (speechRefs.current.me = el)} className="speech-bubble speech-bubble-me">
+        {!isThem ? currentMessage?.text : ''}
+      </div>
+      <div ref={(el) => (speechRefs.current.them = el)} className="speech-bubble speech-bubble-them">
+        {isThem ? currentMessage.text : ''}
+      </div>
+    </>
   )
 }
 
@@ -241,14 +320,99 @@ function TouchPad({ input }) {
   )
 }
 
+function TalkHud({ user, topic, status, onMicTap, onClose, micDisabled, done, hasSlang, explanation, onExplain }) {
+  return (
+    <>
+      <button className="talk-close-btn" onClick={onClose}>
+        ✕
+      </button>
+      <div className="talk-hud">
+        <p className="talk-status">
+          {done ? `That's everything for now 🎉` : status}
+        </p>
+        {hasSlang && !explanation && (
+          <button className="explain-chip" onClick={onExplain}>
+            ✨ AI explains
+          </button>
+        )}
+        {explanation === 'loading' && <div className="explain-bubble loading">Thinking…</div>}
+        {explanation && explanation !== 'loading' && (
+          <div className="explain-bubble">
+            <span className="label-caps accent">AI culture note · slang</span>
+            <strong>{explanation.term}</strong>
+            <p>{explanation.explanation}</p>
+          </div>
+        )}
+        {!done && (
+          <button className="mic-btn" onClick={onMicTap} disabled={micDisabled}>
+            🎙️
+          </button>
+        )}
+      </div>
+    </>
+  )
+}
+
 // A small 3D virtual world — move with WASD/arrow keys (desktop) or the
-// on-screen D-pad (touch), and tap an NPC (their body or name tag) to talk
-// to them. `onTalk(userId)` is left to the caller — in Virtual mode that
-// opens an in-world conversation overlay rather than leaving the scene.
-export default function Village3D({ onTalk, children }) {
+// on-screen D-pad (touch). Tap a villager (their body or name tag) to talk
+// to them face to face: the camera zooms in and dialogue appears as speech
+// bubbles above each of you, instead of opening a separate chat screen.
+export default function Village3D() {
   const input = useMoveInput()
   const posRef = useRef({ x: 0, z: (ME.y / 100 - 0.5) * WORLD_HALF_Z * 2 })
   const labelRefs = useRef({})
+  const speechRefs = useRef({})
+  const talkTargetRef = useRef(null)
+
+  const [talkingId, setTalkingId] = useState(null)
+  const [revealedCount, setRevealedCount] = useState(0)
+  const [explanations, setExplanations] = useState({})
+
+  const talkingUser = talkingId ? LOBBY_USERS.find((u) => u.id === talkingId) : null
+  const messages = talkingId ? CONVERSATIONS[talkingId]?.messages ?? [] : []
+  const done = talkingId ? revealedCount >= messages.length : false
+  const currentMessage = revealedCount > 0 ? messages[revealedCount - 1] : null
+  const nextMessage = messages[revealedCount]
+  const waitingOnThem = !done && nextMessage?.from === 'them'
+
+  function startTalking(userId) {
+    const [x, z] = toWorld(LOBBY_USERS.find((u) => u.id === userId))
+    talkTargetRef.current = { x, z }
+    setTalkingId(userId)
+    setRevealedCount(Math.min(1, (CONVERSATIONS[userId]?.messages ?? []).length))
+    setExplanations({})
+  }
+
+  function stopTalking() {
+    talkTargetRef.current = null
+    setTalkingId(null)
+  }
+
+  // Their lines play on their own, like someone actually talking to you;
+  // yours wait for a mic tap. Cancels cleanly if the player taps ahead.
+  useEffect(() => {
+    if (!talkingId || done || nextMessage?.from !== 'them') return
+    const t = setTimeout(() => setRevealedCount((c) => c + 1), 1100)
+    return () => clearTimeout(t)
+  }, [talkingId, revealedCount, done, nextMessage])
+
+  function handleMicTap() {
+    if (!talkingId || done) return
+    setRevealedCount((c) => c + 1)
+  }
+
+  async function handleExplain() {
+    if (!currentMessage) return
+    const keys = detectSlang(currentMessage.text, currentMessage.slang)
+    const key = keys[0]
+    if (!key) return
+    setExplanations((prev) => ({ ...prev, [revealedCount]: 'loading' }))
+    const result = await explainText(currentMessage.text, key)
+    setExplanations((prev) => ({ ...prev, [revealedCount]: result }))
+  }
+
+  const slangKeys = currentMessage?.from === 'them' ? detectSlang(currentMessage.text, currentMessage.slang) : []
+  const hasSlang = slangKeys.length > 0
 
   return (
     <div className="village3d-wrap">
@@ -280,16 +444,30 @@ export default function Village3D({ onTalk, children }) {
           ))}
 
           {LOBBY_USERS.map((user) => (
-            <Villager key={user.id} user={user} onTalk={onTalk} />
+            <Villager key={user.id} user={user} onTalk={startTalking} posRef={posRef} />
           ))}
-          <Player input={input} posRef={posRef} />
-          <CameraRig posRef={posRef} />
-          <LabelProjector posRef={posRef} labelRefs={labelRefs} />
+          <Player input={input} posRef={posRef} frozen={!!talkingId} />
+          <CameraRig posRef={posRef} talkTargetRef={talkTargetRef} />
+          <SceneProjector posRef={posRef} labelRefs={labelRefs} talkTargetRef={talkTargetRef} speechRefs={speechRefs} />
         </Canvas>
-        <LabelOverlay labelRefs={labelRefs} onTalk={onTalk} />
+        <LabelOverlay labelRefs={labelRefs} onTalk={startTalking} posRef={posRef} />
+        <SpeechBubbles speechRefs={speechRefs} talkingUser={talkingUser} currentMessage={currentMessage} />
       </div>
-      <TouchPad input={input} />
-      {children}
+      {!talkingId && <TouchPad input={input} />}
+      {talkingUser && (
+        <TalkHud
+          user={talkingUser}
+          topic={CONVERSATIONS[talkingId]?.topic}
+          status={waitingOnThem ? `${talkingUser.name} is talking…` : 'Hold to talk'}
+          onMicTap={handleMicTap}
+          onClose={stopTalking}
+          micDisabled={waitingOnThem}
+          done={done}
+          hasSlang={hasSlang}
+          explanation={explanations[revealedCount]}
+          onExplain={handleExplain}
+        />
+      )}
     </div>
   )
 }

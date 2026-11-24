@@ -21,11 +21,11 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
      contact to open the typed `/chat/:userId` screen, same as before there was a village at all.
    - *Virtual World* — a real 3D scene (`src/components/Village3D.jsx`, built with
      `@react-three/fiber`/Three.js): grass, a pond, trees and flowers, with a third-person chase
-     camera. Move with arrow keys/WASD (desktop) or the on-screen D-pad (touch). Talking to
-     someone here doesn't open a separate chat screen — tapping their body or name tag opens an
-     in-world conversation overlay (`VillageTalk.jsx`) right there: their lines play out on
-     their own like someone actually talking to you, and yours wait for a mic tap, closer to a
-     real face-to-face conversation than a messaging app.
+     camera. Move with arrow keys/WASD (desktop) or the on-screen D-pad (touch). Walk close to
+     someone — their name tag turns green once you're in range — and tap them (body or name
+     tag) to talk. No separate chat screen opens: the camera zooms in to frame the two of you,
+     and dialogue appears as real speech bubbles floating above each of your heads. Their lines
+     play out on their own, like someone actually talking to you; yours wait for a mic tap.
 2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": choose a
    language (Spanish or English) via tabs, then pick any real-life practice topic (Everyday
    Chat, Ordering Food, Asking Directions) with no restrictions — a ✓ marks ones you've
@@ -78,7 +78,7 @@ center itself in a phone-shaped frame on wider screens.
 
 React + Vite, `react-router-dom` (HashRouter), plain CSS (no UI framework) with a peach
 color theme defined in `src/App.css`. The Lobby's 3D world uses `three` +
-`@react-three/fiber` directly — name tags are a hand-rolled world-to-screen projection
-overlay (`LabelProjector`/`LabelOverlay` in `Village3D.jsx`) rather than `@react-three/drei`'s
-`<Html>`, which has a known bug where one of several simultaneous instances can silently fail
-to mount.
+`@react-three/fiber` directly — name tags and speech bubbles are a hand-rolled
+world-to-screen projection overlay (`SceneProjector` in `Village3D.jsx`, using
+`Vector3.project(camera)` each frame) rather than `@react-three/drei`'s `<Html>`, which has a
+known bug where one of several simultaneous instances can silently fail to mount.

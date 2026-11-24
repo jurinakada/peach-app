@@ -4,13 +4,11 @@ import { AI_PARTNER_PROFILE } from '../mockData'
 import Avatar from '../components/Avatar'
 import CoinBadge from '../components/CoinBadge'
 import Village3D from '../components/Village3D'
-import VillageTalk from '../components/VillageTalk'
 import ContactList from '../components/ContactList'
 
 export default function Lobby() {
   const navigate = useNavigate()
   const [mode, setMode] = useState('normal') // 'normal' | 'virtual'
-  const [talkingTo, setTalkingTo] = useState(null)
 
   return (
     <div className="screen">
@@ -54,10 +52,8 @@ export default function Lobby() {
 
       {mode === 'virtual' ? (
         <>
-          <p className="lobby-sub">Move around and talk to people, face to face</p>
-          <Village3D onTalk={setTalkingTo}>
-            {talkingTo && <VillageTalk userId={talkingTo} onClose={() => setTalkingTo(null)} />}
-          </Village3D>
+          <p className="lobby-sub">Walk up close to someone (their name turns green) and tap to talk</p>
+          <Village3D />
         </>
       ) : (
         <>
