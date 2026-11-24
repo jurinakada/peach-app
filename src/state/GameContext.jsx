@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { STARTING_COINS } from '../mockData'
 
-const STORAGE_KEY = 'peach-game-state-v3'
+const STORAGE_KEY = 'peach-game-state-v4'
 
 const GameContext = createContext(null)
 
@@ -45,11 +45,13 @@ export function GameProvider({ children }) {
   }
 
   // Marks an AI Partner scenario finished — drives Study Plan lesson unlocks.
-  function completeScenario(scenarioId) {
+  // Keyed by "<langCode>:<scenarioId>" since scenario ids repeat per language.
+  function completeScenario(langCode, scenarioId) {
+    const key = `${langCode}:${scenarioId}`
     setState((prev) =>
-      prev.completedScenarios.includes(scenarioId)
+      prev.completedScenarios.includes(key)
         ? prev
-        : { ...prev, completedScenarios: [...prev.completedScenarios, scenarioId] }
+        : { ...prev, completedScenarios: [...prev.completedScenarios, key] }
     )
   }
 

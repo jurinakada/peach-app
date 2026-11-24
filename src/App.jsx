@@ -40,7 +40,7 @@ function AppShell() {
             <Route path="/" element={<Lobby />} />
             <Route path="/chat/:userId" element={<Chat />} />
             <Route path="/ai-partner" element={<AIPartnerPicker />} />
-            <Route path="/ai-partner/:scenarioId" element={<AIPartner />} />
+            <Route path="/ai-partner/:langCode/:scenarioId" element={<AIPartner />} />
             <Route path="/study-plan" element={<StudyPlan />} />
             <Route path="/battle" element={<Battle />} />
             <Route path="/shop" element={<Shop />} />

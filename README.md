@@ -17,18 +17,20 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
    (bonus coins + a starter collectible). Resets if you clear the browser's localStorage.
 1. **Lobby** (`/`) — "Talk with your AI Partner" and "Your Study Plan" cards up top, and below
    them a 2D room with human avatars. Tap an avatar to open a text chat with that person.
-2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": pick any
-   real-life practice topic (Everyday Chat, Ordering Food, Asking Directions) with no
-   restrictions — a ✓ marks ones you've already completed.
-3. **AI Partner session** (`/ai-partner/:scenarioId`) — a scripted voice-practice session for
-   the chosen topic. Tap the mic ("Hold to talk") to "speak" your next line; it reveals a
-   transcribed reply with a Pronunciation Coach score + tip, then the partner's response (with
-   translation). Replies containing slang or a cultural reference show a "✨ Smart Chat" chip;
+2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": choose a
+   language (Spanish or English) via tabs, then pick any real-life practice topic (Everyday
+   Chat, Ordering Food, Asking Directions) with no restrictions — a ✓ marks ones you've
+   already completed, tracked per language.
+3. **AI Partner session** (`/ai-partner/:langCode/:scenarioId`) — a scripted voice-practice
+   session for the chosen language + topic. Tap the mic ("Hold to talk") to "speak" your next
+   line; it reveals a transcribed reply with a Pronunciation Coach score + tip, then the
+   partner's response (with an English translation, when the target language isn't already
+   English). Replies containing slang or a cultural reference show a "✨ Smart Chat" chip;
    tapping it reveals an "AI culture note" card. Explanations come from a hardcoded dictionary
    — see `src/ai/explain.js` for the stub where a real LLM/STT call would go.
-4. **Study Plan** (`/study-plan`) — "lessons fit your level and goals": the same three
-   scenarios as a guided, ordered path — each lesson unlocks only once the one before it is
-   completed.
+4. **Study Plan** (`/study-plan`) — "lessons fit your level and goals": your current plan's
+   language (Spanish, by default — see `STUDY_PLAN.languageCode` in mockData) presented as a
+   guided, ordered path — each lesson unlocks only once the one before it is completed.
 5. **Chat** (`/chat/:userId`) — HelloTalk-style typed chat with a real human contact. Messages
    containing slang or a cultural reference show a "✨ AI explains" chip that reveals the same
    kind of culture-note card.
@@ -43,10 +45,12 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
 ## Mock data
 
 Everything editable lives in **`src/mockData.js`**: the human lobby contacts + their typed
-conversations, the `AI_PARTNER_PROFILE` + `AI_PARTNER_SCENARIOS` (scripted turns, translations,
-pronunciation scores — also what drives the Study Plan's lesson list), the
+conversations, `AI_PARTNER_LANGUAGES` + `AI_PARTNER_SCENARIOS` (scripted turns per language,
+translations, pronunciation scores — also what drives the Study Plan's lesson list), the
 slang/cultural-reference dictionary, battle mission rounds (hints, choices, rewards), and
-culture items. Edit that one file to change content without touching any component code.
+culture items. Edit that one file to change content without touching any component code —
+adding a third language is just adding another key to `AI_PARTNER_SCENARIOS` and an entry in
+`AI_PARTNER_LANGUAGES`.
 
 Coins, owned items, and completed AI Partner scenarios persist to `localStorage` so progress
 survives a refresh (`src/state/GameContext.jsx`).

@@ -127,6 +127,16 @@ export const SLANG_DICTIONARY = {
     explanation:
       'The most common way to order a Spanish-style latte in Spain — espresso with hot, steamed milk.',
   },
+  'for here or to go': {
+    term: '"For here or to go?"',
+    explanation:
+      'A standard question at US cafés asking whether you\'ll eat in (for here) or take your order with you (to go).',
+  },
+  'no worries': {
+    term: 'No worries',
+    explanation:
+      'A casual, friendly way to say "you\'re welcome" or "it\'s fine" — common in English, especially Australian/British English.',
+  },
 }
 
 // Conversations with the four LOBBY_USERS contacts — real human chat partners
@@ -173,115 +183,189 @@ export const CONVERSATIONS = {
 }
 
 // The ONE AI Partner — a single always-available conversation practice
-// partner (separate from the human LOBBY_USERS contacts above).
+// partner (separate from the human LOBBY_USERS contacts above). Its avatar
+// stays the same; which language it speaks is picked on the practice screen.
 export const AI_PARTNER_PROFILE = {
   id: 'ai-partner',
-  lang: 'Spanish',
-  flag: '🇪🇸',
   emoji: '🍑',
   color: '#ffceb0',
 }
 
-// Real-life practice scenarios — each a scripted back-and-forth with the AI
-// Partner. Also doubles as the Study Plan's lesson list (see STUDY_PLAN
-// below), so a scenario is both "practice any time" and "a lesson". Each
-// turn is either:
-//   { from: 'ai', text, translation, slang?: [dictionaryKey] }
-//   { from: 'me', text, pronunciation: { score, tip } }
-// `slang` keys are passed straight to explainText() — see ai/explain.js.
-export const AI_PARTNER_SCENARIOS = [
-  {
-    id: 'weekend',
-    title: 'Everyday Chat',
-    icon: '💬',
-    topic: 'Weekend',
-    turns: [
-      { from: 'ai', text: '¿Qué hiciste el fin de semana?', translation: 'What did you do on the weekend?' },
-      {
-        from: 'me',
-        text: 'Fui a la playa con mis amigos.',
-        pronunciation: { score: 92, tip: "soften the 'y' in playa" },
-      },
-      { from: 'ai', text: '¡Qué guay! ¿Nadaste?', translation: 'Nice! Did you swim?', slang: ['guay'] },
-      {
-        from: 'me',
-        text: 'Sí, el agua estaba perfecta.',
-        pronunciation: { score: 91, tip: "roll the double 'rr' sound — agua has none, careful not to add it" },
-      },
-      {
-        from: 'ai',
-        text: 'Después seguro tocó sobremesa con la familia, ¿no?',
-        translation: 'Afterwards you probably had sobremesa with the family, right?',
-        slang: ['sobremesa'],
-      },
-    ],
-  },
-  {
-    id: 'cafe',
-    title: 'Ordering Food',
-    icon: '☕',
-    topic: 'Ordering food at a café',
-    turns: [
-      { from: 'ai', text: '¡Hola! ¿Qué te gustaría pedir?', translation: 'Hello! What would you like to order?' },
-      {
-        from: 'me',
-        text: 'Quiero un café con leche, por favor.',
-        pronunciation: { score: 88, tip: "soften the 'b' sound in favor" },
-      },
-      {
-        from: 'ai',
-        text: '¡Perfecto! Un café con leche es una gran elección.',
-        translation: 'Perfect! A café con leche is a great choice.',
-        slang: ['café con leche'],
-      },
-      {
-        from: 'me',
-        text: 'Sí, también quiero un croissant.',
-        pronunciation: { score: 90, tip: "lengthen the vowel sound in croissant" },
-      },
-      {
-        from: 'ai',
-        text: '¡Marchando! Serán cinco euros.',
-        translation: "Coming right up! That'll be five euros.",
-      },
-    ],
-  },
-  {
-    id: 'directions',
-    title: 'Asking Directions',
-    icon: '🧭',
-    topic: 'Asking for Directions',
-    turns: [
-      {
-        from: 'ai',
-        text: '¿Necesitas ayuda para encontrar algo?',
-        translation: 'Do you need help finding something?',
-      },
-      {
-        from: 'me',
-        text: 'Sí, busco la estación de tren.',
-        pronunciation: { score: 90, tip: "soften the 'c' sound in estación" },
-      },
-      {
-        from: 'ai',
-        text: 'Sigue recto y gira a la derecha en la plaza.',
-        translation: 'Go straight and turn right at the square.',
-      },
-      {
-        from: 'me',
-        text: 'Muchas gracias, ¡qué amable!',
-        pronunciation: { score: 93, tip: "stress the first syllable in gracias" },
-      },
-      { from: 'ai', text: '¡De nada! Buen viaje.', translation: "You're welcome! Safe travels." },
-    ],
-  },
+export const AI_PARTNER_LANGUAGES = [
+  { code: 'es', lang: 'Spanish', flag: '🇪🇸' },
+  { code: 'en', lang: 'English', flag: '🇬🇧' },
 ]
 
-// Your own study plan — level, goal, and a recommended ORDER to practice the
-// scenarios above. Unlike the free-access scenario picker, lessons here
-// unlock one at a time as you complete the previous one.
+// Real-life practice scenarios, grouped by language code (see
+// AI_PARTNER_LANGUAGES). Also doubles as the Study Plan's lesson list (see
+// STUDY_PLAN below), so a scenario is both "practice any time" and "a
+// lesson". Each turn is either:
+//   { from: 'ai', text, translation?, slang?: [dictionaryKey] }
+//   { from: 'me', text, pronunciation: { score, tip } }
+// `translation` is omitted when the scenario's language already matches the
+// display language (English). `slang` keys are passed straight to
+// explainText() — see ai/explain.js.
+export const AI_PARTNER_SCENARIOS = {
+  es: [
+    {
+      id: 'weekend',
+      title: 'Everyday Chat',
+      icon: '💬',
+      topic: 'Weekend',
+      turns: [
+        { from: 'ai', text: '¿Qué hiciste el fin de semana?', translation: 'What did you do on the weekend?' },
+        {
+          from: 'me',
+          text: 'Fui a la playa con mis amigos.',
+          pronunciation: { score: 92, tip: "soften the 'y' in playa" },
+        },
+        { from: 'ai', text: '¡Qué guay! ¿Nadaste?', translation: 'Nice! Did you swim?', slang: ['guay'] },
+        {
+          from: 'me',
+          text: 'Sí, el agua estaba perfecta.',
+          pronunciation: { score: 91, tip: "roll the double 'rr' sound — agua has none, careful not to add it" },
+        },
+        {
+          from: 'ai',
+          text: 'Después seguro tocó sobremesa con la familia, ¿no?',
+          translation: 'Afterwards you probably had sobremesa with the family, right?',
+          slang: ['sobremesa'],
+        },
+      ],
+    },
+    {
+      id: 'cafe',
+      title: 'Ordering Food',
+      icon: '☕',
+      topic: 'Ordering food at a café',
+      turns: [
+        { from: 'ai', text: '¡Hola! ¿Qué te gustaría pedir?', translation: 'Hello! What would you like to order?' },
+        {
+          from: 'me',
+          text: 'Quiero un café con leche, por favor.',
+          pronunciation: { score: 88, tip: "soften the 'b' sound in favor" },
+        },
+        {
+          from: 'ai',
+          text: '¡Perfecto! Un café con leche es una gran elección.',
+          translation: 'Perfect! A café con leche is a great choice.',
+          slang: ['café con leche'],
+        },
+        {
+          from: 'me',
+          text: 'Sí, también quiero un croissant.',
+          pronunciation: { score: 90, tip: "lengthen the vowel sound in croissant" },
+        },
+        {
+          from: 'ai',
+          text: '¡Marchando! Serán cinco euros.',
+          translation: "Coming right up! That'll be five euros.",
+        },
+      ],
+    },
+    {
+      id: 'directions',
+      title: 'Asking Directions',
+      icon: '🧭',
+      topic: 'Asking for Directions',
+      turns: [
+        {
+          from: 'ai',
+          text: '¿Necesitas ayuda para encontrar algo?',
+          translation: 'Do you need help finding something?',
+        },
+        {
+          from: 'me',
+          text: 'Sí, busco la estación de tren.',
+          pronunciation: { score: 90, tip: "soften the 'c' sound in estación" },
+        },
+        {
+          from: 'ai',
+          text: 'Sigue recto y gira a la derecha en la plaza.',
+          translation: 'Go straight and turn right at the square.',
+        },
+        {
+          from: 'me',
+          text: 'Muchas gracias, ¡qué amable!',
+          pronunciation: { score: 93, tip: "stress the first syllable in gracias" },
+        },
+        { from: 'ai', text: '¡De nada! Buen viaje.', translation: "You're welcome! Safe travels." },
+      ],
+    },
+  ],
+  en: [
+    {
+      id: 'weekend',
+      title: 'Everyday Chat',
+      icon: '💬',
+      topic: 'Weekend',
+      turns: [
+        { from: 'ai', text: 'What did you do this weekend?' },
+        {
+          from: 'me',
+          text: 'I went to the beach with my friends.',
+          pronunciation: { score: 90, tip: "stress the first syllable in 'friends'" },
+        },
+        { from: 'ai', text: 'Nice! Did you swim?' },
+        {
+          from: 'me',
+          text: 'Yeah, the water was perfect.',
+          pronunciation: { score: 94, tip: "soften the 'w' in water, don't over-round your lips" },
+        },
+        { from: 'ai', text: "Must've been fun — YOLO, am I right?", slang: ['yolo'] },
+      ],
+    },
+    {
+      id: 'cafe',
+      title: 'Ordering Food',
+      icon: '☕',
+      topic: 'Ordering food at a café',
+      turns: [
+        { from: 'ai', text: 'Hi! What would you like to order?' },
+        {
+          from: 'me',
+          text: "I'll have a latte, please.",
+          pronunciation: { score: 89, tip: "soften the double 't' sound in latte" },
+        },
+        { from: 'ai', text: 'Great choice! For here or to go?', slang: ['for here or to go'] },
+        {
+          from: 'me',
+          text: 'For here, thanks.',
+          pronunciation: { score: 95, tip: "don't drop the 'r' in for" },
+        },
+        { from: 'ai', text: "Coming right up! That'll be five dollars." },
+      ],
+    },
+    {
+      id: 'directions',
+      title: 'Asking Directions',
+      icon: '🧭',
+      topic: 'Asking for Directions',
+      turns: [
+        { from: 'ai', text: 'Do you need help finding something?' },
+        {
+          from: 'me',
+          text: "Yes, I'm looking for the train station.",
+          pronunciation: { score: 91, tip: "stress the second syllable in 'station'" },
+        },
+        { from: 'ai', text: 'Go straight and turn right at the corner.' },
+        {
+          from: 'me',
+          text: "Thanks so much, that's very kind of you!",
+          pronunciation: { score: 92, tip: "link 'so much' smoothly, don't pause between the words" },
+        },
+        { from: 'ai', text: 'No worries! Safe travels.', slang: ['no worries'] },
+      ],
+    },
+  ],
+}
+
+// Your own study plan — level, goal, and a recommended ORDER to practice a
+// language's scenarios above. Unlike the free-access scenario picker,
+// lessons here unlock one at a time as you complete the previous one.
 export const STUDY_PLAN = {
   level: 'Beginner',
+  languageCode: 'es',
   language: 'Spanish',
   goal: 'Travel-ready conversations in 3 months',
 }

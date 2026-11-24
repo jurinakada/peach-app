@@ -19,7 +19,7 @@ export default function Lobby() {
         <Avatar emoji={AI_PARTNER_PROFILE.emoji} color={AI_PARTNER_PROFILE.color} size={40} />
         <div className="ai-partner-card-text">
           <strong>Talk with your AI Partner</strong>
-          <span>Practice {AI_PARTNER_PROFILE.lang} any time, at your own speed</span>
+          <span>Practice Spanish or English any time, at your own speed</span>
         </div>
         <span className="ai-partner-card-arrow">›</span>
       </button>

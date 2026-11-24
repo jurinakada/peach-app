@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AI_PARTNER_PROFILE, AI_PARTNER_SCENARIOS } from '../mockData'
+import { AI_PARTNER_LANGUAGES, AI_PARTNER_PROFILE, AI_PARTNER_SCENARIOS } from '../mockData'
 import { detectSlang, explainText } from '../ai/explain'
 import Avatar from '../components/Avatar'
 import { useGame } from '../state/GameContext'
 
 // Your one AI conversation partner, running a scripted voice-practice
-// session for whichever scenario was picked. Tapping the mic "speaks" your
-// next line (with a pronunciation score), then the partner replies in turn.
-// This mirrors a voice conversation without needing real speech recognition
-// — swap handleMicTap's timeouts for a real STT/LLM round trip later.
+// session for whichever language + scenario was picked. Tapping the mic
+// "speaks" your next line (with a pronunciation score), then the partner
+// replies in turn. This mirrors a voice conversation without needing real
+// speech recognition — swap handleMicTap's timeouts for a real STT/LLM
+// round trip later.
 export default function AIPartner() {
-  const { scenarioId } = useParams()
+  const { langCode, scenarioId } = useParams()
   const navigate = useNavigate()
   const { completeScenario } = useGame()
-  const scenario = AI_PARTNER_SCENARIOS.find((s) => s.id === scenarioId)
+  const language = AI_PARTNER_LANGUAGES.find((l) => l.code === langCode)
+  const scenario = AI_PARTNER_SCENARIOS[langCode]?.find((s) => s.id === scenarioId)
   const turns = scenario?.turns ?? []
 
   const [revealedCount, setRevealedCount] = useState(Math.min(1, turns.length))
@@ -30,11 +32,11 @@ export default function AIPartner() {
   useEffect(() => {
     if (done && !completed.current) {
       completed.current = true
-      completeScenario(scenario.id)
+      completeScenario(langCode, scenario.id)
     }
-  }, [done, scenario, completeScenario])
+  }, [done, langCode, scenario, completeScenario])
 
-  if (!scenario) {
+  if (!language || !scenario) {
     return (
       <div className="screen">
         <p>Unknown scenario.</p>
@@ -73,7 +75,9 @@ export default function AIPartner() {
       <header className="screen-header chat-header">
         <Avatar emoji={AI_PARTNER_PROFILE.emoji} color={AI_PARTNER_PROFILE.color} size={36} />
         <div className="chat-header-text">
-          <strong>{AI_PARTNER_PROFILE.lang} · AI Partner</strong>
+          <strong>
+            {language.flag} {language.lang} · AI Partner
+          </strong>
           <span className="label-caps">Topic · {scenario.topic}</span>
         </div>
         <button className="close-btn" onClick={() => navigate('/ai-partner')}>
@@ -91,7 +95,7 @@ export default function AIPartner() {
               <div key={index} className="bubble-row them">
                 <div className="bubble them">
                   <div>{turn.text}</div>
-                  <div className="bubble-translation">{turn.translation}</div>
+                  {turn.translation && <div className="bubble-translation">{turn.translation}</div>}
                 </div>
                 {hasSlang && !explanation && (
                   <button className="explain-chip" onClick={() => handleExplain(index, turn)}>
