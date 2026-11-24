@@ -16,7 +16,9 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
 0. **Onboarding** — shown once on first load: a splash carousel followed by a welcome reward
    (bonus coins + a starter collectible). Resets if you clear the browser's localStorage.
 1. **Lobby** (`/`) — "Talk with your AI Partner" and "Your Study Plan" cards up top, and below
-   them a 2D room with human avatars. Tap an avatar to open a text chat with that person.
+   them a small walkable village (grass, a winding path, a pond, trees and flowers —
+   Animal-Crossing-flavored, not a literal copy). Tap the ground (or use arrow keys/WASD) to
+   walk your character around; tap another avatar to open a text chat with that person.
 2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": choose a
    language (Spanish or English) via tabs, then pick any real-life practice topic (Everyday
    Chat, Ordering Food, Asking Directions) with no restrictions — a ✓ marks ones you've
