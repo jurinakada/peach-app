@@ -410,6 +410,82 @@
   white-space: nowrap;
 }
 
+.mode-tabs {
+  margin: 10px 0 14px;
+}
+
+/* ---------- contact list (Normal mode) ---------- */
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.contact-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.online-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid var(--card);
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.contact-info strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.contact-info span {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.contact-chevron {
+  font-size: 20px;
+  color: var(--ink-soft);
+}
+
+/* ---------- in-world talk overlay (Virtual mode) ---------- */
+
+.village-talk {
+  position: absolute;
+  inset: 0;
+  background: var(--peach-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 0;
+}
+
+.village-talk .chat-messages {
+  flex: 1;
+}
+
 /* ---------- onboarding ---------- */
 
 .onboarding-screen {

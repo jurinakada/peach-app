@@ -15,11 +15,17 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
 
 0. **Onboarding** — shown once on first load: a splash carousel followed by a welcome reward
    (bonus coins + a starter collectible). Resets if you clear the browser's localStorage.
-1. **Lobby** (`/`) — "Talk with your AI Partner" and "Your Study Plan" cards up top, and below
-   them a real 3D virtual world (`src/components/Village3D.jsx`, built with
-   `@react-three/fiber`/Three.js): grass, a pond, trees and flowers, with a third-person chase
-   camera. Move with arrow keys/WASD (desktop) or the on-screen D-pad (touch); tap another
-   character's body or name tag to open a text chat with them.
+1. **Lobby** (`/`) — "Talk with your AI Partner" and "Your Study Plan" cards up top, then a
+   **Normal / Virtual World** toggle:
+   - *Normal* — a plain HelloTalk-style contact list (`src/components/ContactList.jsx`); tap a
+     contact to open the typed `/chat/:userId` screen, same as before there was a village at all.
+   - *Virtual World* — a real 3D scene (`src/components/Village3D.jsx`, built with
+     `@react-three/fiber`/Three.js): grass, a pond, trees and flowers, with a third-person chase
+     camera. Move with arrow keys/WASD (desktop) or the on-screen D-pad (touch). Talking to
+     someone here doesn't open a separate chat screen — tapping their body or name tag opens an
+     in-world conversation overlay (`VillageTalk.jsx`) right there: their lines play out on
+     their own like someone actually talking to you, and yours wait for a mic tap, closer to a
+     real face-to-face conversation than a messaging app.
 2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": choose a
    language (Spanish or English) via tabs, then pick any real-life practice topic (Everyday
    Chat, Ordering Food, Asking Directions) with no restrictions — a ✓ marks ones you've

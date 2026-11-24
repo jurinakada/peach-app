@@ -1,11 +1,16 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AI_PARTNER_PROFILE } from '../mockData'
 import Avatar from '../components/Avatar'
 import CoinBadge from '../components/CoinBadge'
 import Village3D from '../components/Village3D'
+import VillageTalk from '../components/VillageTalk'
+import ContactList from '../components/ContactList'
 
 export default function Lobby() {
   const navigate = useNavigate()
+  const [mode, setMode] = useState('normal') // 'normal' | 'virtual'
+  const [talkingTo, setTalkingTo] = useState(null)
 
   return (
     <div className="screen">
@@ -32,9 +37,34 @@ export default function Lobby() {
         <span className="ai-partner-card-arrow">›</span>
       </button>
 
-      <p className="lobby-sub">Move around, or tap someone to start chatting</p>
+      <div className="shop-tabs mode-tabs">
+        <button
+          className={'shop-tab' + (mode === 'normal' ? ' active' : '')}
+          onClick={() => setMode('normal')}
+        >
+          💬 Normal
+        </button>
+        <button
+          className={'shop-tab' + (mode === 'virtual' ? ' active' : '')}
+          onClick={() => setMode('virtual')}
+        >
+          🌍 Virtual World
+        </button>
+      </div>
 
-      <Village3D />
+      {mode === 'virtual' ? (
+        <>
+          <p className="lobby-sub">Move around and talk to people, face to face</p>
+          <Village3D onTalk={setTalkingTo}>
+            {talkingTo && <VillageTalk userId={talkingTo} onClose={() => setTalkingTo(null)} />}
+          </Village3D>
+        </>
+      ) : (
+        <>
+          <p className="lobby-sub">Tap someone to start chatting</p>
+          <ContactList />
+        </>
+      )}
     </div>
   )
 }

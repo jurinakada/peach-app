@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { LOBBY_USERS, ME } from '../mockData'
 
@@ -243,17 +242,13 @@ function TouchPad({ input }) {
 }
 
 // A small 3D virtual world — move with WASD/arrow keys (desktop) or the
-// on-screen D-pad (touch), and tap an NPC (their body or name tag) to open
-// a chat with them.
-export default function Village3D() {
-  const navigate = useNavigate()
+// on-screen D-pad (touch), and tap an NPC (their body or name tag) to talk
+// to them. `onTalk(userId)` is left to the caller — in Virtual mode that
+// opens an in-world conversation overlay rather than leaving the scene.
+export default function Village3D({ onTalk, children }) {
   const input = useMoveInput()
   const posRef = useRef({ x: 0, z: (ME.y / 100 - 0.5) * WORLD_HALF_Z * 2 })
   const labelRefs = useRef({})
-
-  function onTalk(userId) {
-    navigate(`/chat/${userId}`)
-  }
 
   return (
     <div className="village3d-wrap">
@@ -294,6 +289,7 @@ export default function Village3D() {
         <LabelOverlay labelRefs={labelRefs} onTalk={onTalk} />
       </div>
       <TouchPad input={input} />
+      {children}
     </div>
   )
 }
