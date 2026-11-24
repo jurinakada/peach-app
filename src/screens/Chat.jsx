@@ -8,9 +8,9 @@ export default function Chat() {
   const { userId } = useParams()
   const navigate = useNavigate()
   const user = LOBBY_USERS.find((u) => u.id === userId)
-  const initialMessages = CONVERSATIONS[userId] ?? []
+  const conversation = CONVERSATIONS[userId]
 
-  const [messages, setMessages] = useState(initialMessages)
+  const [messages, setMessages] = useState(conversation?.messages ?? [])
   const [draft, setDraft] = useState('')
   const [explanations, setExplanations] = useState({}) // messageIndex -> { term, explanation } | 'loading'
 
@@ -42,16 +42,16 @@ export default function Chat() {
   return (
     <div className="screen chat-screen">
       <header className="screen-header chat-header">
-        <button className="back-btn" onClick={() => navigate('/')}>
-          ←
-        </button>
         <Avatar emoji={user.emoji} color={user.color} size={36} />
         <div className="chat-header-text">
-          <strong>{user.name}</strong>
-          <span>
-            {user.flag} {user.lang}
-          </span>
+          <strong>
+            {user.flag} {user.name}
+          </strong>
+          <span className="label-caps">Topic · {conversation?.topic}</span>
         </div>
+        <button className="close-btn" onClick={() => navigate('/')}>
+          ✕
+        </button>
       </header>
 
       <div className="chat-messages">
@@ -75,6 +75,7 @@ export default function Chat() {
               )}
               {explanation && explanation !== 'loading' && (
                 <div className="explain-bubble">
+                  <span className="label-caps accent">AI culture note · slang</span>
                   <strong>{explanation.term}</strong>
                   <p>{explanation.explanation}</p>
                 </div>

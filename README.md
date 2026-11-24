@@ -10,24 +10,26 @@ This is a front-end-only prototype — no backend, no real network calls. All da
 ## Screens
 
 1. **Lobby** (`/`) — a 2D room with avatars. Tap an avatar to open a chat with that person.
-2. **Chat** (`/chat/:userId`) — chat with a mock foreign user. Messages containing slang or a
-   cultural reference show an "✨ AI explains" chip; tapping it reveals an explanation bubble.
-   Explanations currently come from a hardcoded dictionary — see `src/ai/explain.js` for the
-   stub where a real LLM call would go.
-3. **Battle** (`/battle`) — a 3-person co-op vocabulary quiz (you + 2 teammates from other
-   countries) against a 10-second-per-question timer. Teammates' native-language words are
-   shown as hints. Winning (and even partial credit) earns coins.
-4. **Shop** (`/shop`) — spend coins on cosmetic items (hats, face accessories, pets,
-   backgrounds). Owned items can be equipped; your equipped hat shows up on your avatar
-   back in the Lobby.
+2. **Chat** (`/chat/:userId`) — chat with a mock foreign user, topic shown under their name.
+   Messages containing slang or a cultural reference show an "✨ AI explains" chip; tapping it
+   reveals an "AI culture note" card. Explanations currently come from a hardcoded dictionary —
+   see `src/ai/explain.js` for the stub where a real LLM call would go.
+3. **Battle** (`/battle`) — Team Peach (you + 2 teammates from other countries) races Team Plum
+   through 5 narrative mission rounds against a 30-second timer. Each round shows one hint in a
+   rotating teammate's native language — "your teammates' language becomes your hint" — plus a
+   lettered multiple-choice answer. Correct answers pay out coins live and unlock a themed
+   collectible item immediately.
+4. **Shop** (`/shop`) — "Collect the World": spend coins on cultural collectible items (each
+   tied to a country) or see the ones you've already won in Battle marked "Owned".
 
 ## Mock data
 
-Everything editable lives in **`src/mockData.js`**: the lobby users, chat conversations, the
-slang/cultural-reference dictionary, battle questions + teammate hints, and shop items. Edit
-that one file to change content without touching any component code.
+Everything editable lives in **`src/mockData.js`**: the lobby users, chat conversations +
+topics, the slang/cultural-reference dictionary, battle mission rounds (hints, choices,
+rewards), and culture items. Edit that one file to change content without touching any
+component code.
 
-Coins and owned/equipped items persist to `localStorage` so progress survives a refresh
+Coins and owned items persist to `localStorage` so progress survives a refresh
 (`src/state/GameContext.jsx`).
 
 ## Running locally

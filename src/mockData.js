@@ -119,113 +119,144 @@ export const SLANG_DICTIONARY = {
   },
 }
 
-// Conversations keyed by LOBBY_USERS id. `slang` lists dictionary keys present in `text`
-// so the UI knows which messages get an "AI explains" chip.
+// Conversations keyed by LOBBY_USERS id. `topic` shows under the chat header.
+// `slang` lists dictionary keys present in `text` so the UI knows which
+// messages get an "AI explains" chip.
 export const CONVERSATIONS = {
-  haruto: [
-    { from: 'them', text: 'Hey! Long time no chat 👋 How was your week?', slang: [] },
-    { from: 'them', text: 'I had a nomikai with my coworkers yesterday, I\'m so tired lol', slang: ['nomikai'] },
-    { from: 'me', text: 'Haha nice! What did you talk about?', slang: [] },
-    { from: 'them', text: 'Mostly work stuff. My boss kept saying "ganbatte" about the new project 😅', slang: ['ganbatte'] },
-    { from: 'them', text: 'Anyway, bet you had a chill week right?', slang: ['bet'] },
-  ],
-  camille: [
-    { from: 'them', text: 'Salut! Ça va? 😊', slang: [] },
-    { from: 'them', text: 'C\'est la rentrée here, everyone is stressed at school', slang: ['la rentrée'] },
-    { from: 'me', text: 'Oh that sounds intense. What is that exactly?', slang: [] },
-    { from: 'them', text: 'My grandma still wants to faire la bise with everyone at family dinners haha', slang: ['faire la bise'] },
-  ],
-  mateo: [
-    { from: 'them', text: 'Buenas! Watched the match yesterday? 🔥', slang: [] },
-    { from: 'them', text: 'After lunch I need my siesta, no cap', slang: ['siesta'] },
-    { from: 'them', text: 'Then sobremesa for like an hour with my family lol', slang: ['sobremesa'] },
-    { from: 'me', text: 'That sounds so relaxing honestly', slang: [] },
-  ],
-  soojin: [
-    { from: 'them', text: 'Hii~ did you finish your homework yet?', slang: [] },
-    { from: 'them', text: 'My little sister is doing so much aegyo to get allowance money 😂', slang: ['aegyo'] },
-    { from: 'them', text: 'This new comeback is jjang btw, you have to listen', slang: ['jjang'] },
-  ],
+  haruto: {
+    topic: 'Weekend',
+    messages: [
+      { from: 'them', text: 'Hey! Long time no chat 👋 How was your week?', slang: [] },
+      { from: 'them', text: 'I had a nomikai with my coworkers yesterday, I\'m so tired lol', slang: ['nomikai'] },
+      { from: 'me', text: 'Haha nice! What did you talk about?', slang: [] },
+      { from: 'them', text: 'Mostly work stuff. My boss kept saying "ganbatte" about the new project 😅', slang: ['ganbatte'] },
+      { from: 'them', text: 'Anyway, bet you had a chill week right?', slang: ['bet'] },
+    ],
+  },
+  camille: {
+    topic: 'School life',
+    messages: [
+      { from: 'them', text: 'Salut! Ça va? 😊', slang: [] },
+      { from: 'them', text: 'C\'est la rentrée here, everyone is stressed at school', slang: ['la rentrée'] },
+      { from: 'me', text: 'Oh that sounds intense. What is that exactly?', slang: [] },
+      { from: 'them', text: 'My grandma still wants to faire la bise with everyone at family dinners haha', slang: ['faire la bise'] },
+    ],
+  },
+  mateo: {
+    topic: 'Daily routine',
+    messages: [
+      { from: 'them', text: 'Buenas! Watched the match yesterday? 🔥', slang: [] },
+      { from: 'them', text: 'After lunch I need my siesta, no cap', slang: ['siesta'] },
+      { from: 'them', text: 'Then sobremesa for like an hour with my family lol', slang: ['sobremesa'] },
+      { from: 'me', text: 'That sounds so relaxing honestly', slang: [] },
+    ],
+  },
+  soojin: {
+    topic: 'Family',
+    messages: [
+      { from: 'them', text: 'Hii~ did you finish your homework yet?', slang: [] },
+      { from: 'them', text: 'My little sister is doing so much aegyo to get allowance money 😂', slang: ['aegyo'] },
+      { from: 'them', text: 'This new comeback is jjang btw, you have to listen', slang: ['jjang'] },
+    ],
+  },
 }
 
-// Co-op battle: me + 2 teammates vs the clock. Each teammate's native word is shown
-// as a hint for every question (regardless of the question's target language) to
-// simulate "learning through your teammates".
+// Team Battle: you + 2 teammates vs "Team Plum" on a timer, round by round.
+// Each round has a narrative mission and ONE hint, voiced in that round's
+// teammate's native language — "your teammates' language becomes your hint".
 export const BATTLE_TEAMMATES = [
   { id: 'haruto', name: 'Haruto', flag: '🇯🇵', lang: 'Japanese' },
   { id: 'camille', name: 'Camille', flag: '🇫🇷', lang: 'French' },
 ]
 
-export const BATTLE_QUESTIONS = [
+export const OPPONENT_TEAM_NAME = 'Team Plum'
+export const OPPONENT_SCORE_GAINS = [18, 22, 15, 25, 20]
+
+export const BATTLE_ROUNDS = [
   {
-    id: 'q1',
-    prompt: 'Which word means "water"?',
-    choices: ['Agua', 'Fuego', 'Cielo', 'Tierra'],
-    answer: 'Agua',
-    hints: [
-      { teammateId: 'haruto', word: '水 (mizu)' },
-      { teammateId: 'camille', word: 'eau' },
+    id: 'r1',
+    mission: 'Find the hidden café together',
+    hint: { teammateId: 'haruto', text: '喫茶店は赤いドアです (Kissaten wa akai doa desu)', translation: 'The café has a red door' },
+    question: 'Which door is the café?',
+    choices: [
+      { id: 'a', label: 'Blue door', color: '#5b8def' },
+      { id: 'b', label: 'Red door', color: '#e2574c' },
+      { id: 'c', label: 'Green door', color: '#4caf7d' },
     ],
+    answerId: 'b',
+    reward: { coins: 30, item: 'paper_fan' },
   },
   {
-    id: 'q2',
-    prompt: 'Which word means "friend"?',
-    choices: ['Enemigo', 'Amigo', 'Extraño', 'Vecino'],
-    answer: 'Amigo',
-    hints: [
-      { teammateId: 'haruto', word: '友達 (tomodachi)' },
-      { teammateId: 'camille', word: 'ami' },
+    id: 'r2',
+    mission: 'Order breakfast like a local in Paris',
+    hint: { teammateId: 'camille', text: 'Je prends un croissant, s\'il vous plaît', translation: "I'll have a croissant, please" },
+    question: 'What should you order?',
+    choices: [
+      { id: 'a', label: 'Soup', color: '#5b8def' },
+      { id: 'b', label: 'Croissant', color: '#e2574c' },
+      { id: 'c', label: 'Steak', color: '#4caf7d' },
     ],
+    answerId: 'b',
+    reward: { coins: 30, item: 'croissant' },
   },
   {
-    id: 'q3',
-    prompt: 'Which word means "to eat"?',
-    choices: ['Dormir', 'Correr', 'Comer', 'Hablar'],
-    answer: 'Comer',
-    hints: [
-      { teammateId: 'haruto', word: '食べる (taberu)' },
-      { teammateId: 'camille', word: 'manger' },
+    id: 'r3',
+    mission: 'Catch the right bus to the market in London',
+    hint: { teammateId: 'haruto', text: '赤いバスに乗ってください (Akai basu ni notte kudasai)', translation: 'Please get on the red bus' },
+    question: 'Which bus do you take?',
+    choices: [
+      { id: 'a', label: 'Blue bus', color: '#5b8def' },
+      { id: 'b', label: 'Red bus', color: '#e2574c' },
+      { id: 'c', label: 'Green bus', color: '#4caf7d' },
     ],
+    answerId: 'b',
+    reward: { coins: 35, item: 'red_bus' },
   },
   {
-    id: 'q4',
-    prompt: 'Which word means "happy"?',
-    choices: ['Triste', 'Cansado', 'Feliz', 'Enojado'],
-    answer: 'Feliz',
-    hints: [
-      { teammateId: 'haruto', word: '幸せ (shiawase)' },
-      { teammateId: 'camille', word: 'heureux' },
+    id: 'r4',
+    mission: 'Pick the right street snack in Mexico City',
+    hint: { teammateId: 'camille', text: 'Prends le taco, pas la soupe', translation: 'Take the taco, not the soup' },
+    question: 'What do you order?',
+    choices: [
+      { id: 'a', label: 'Soup', color: '#5b8def' },
+      { id: 'b', label: 'Taco', color: '#e2574c' },
+      { id: 'c', label: 'Salad', color: '#4caf7d' },
     ],
+    answerId: 'b',
+    reward: { coins: 35, item: 'taco' },
   },
   {
-    id: 'q5',
-    prompt: 'Which word means "tomorrow"?',
-    choices: ['Ayer', 'Hoy', 'Mañana', 'Nunca'],
-    answer: 'Mañana',
-    hints: [
-      { teammateId: 'haruto', word: '明日 (ashita)' },
-      { teammateId: 'camille', word: 'demain' },
+    id: 'r5',
+    mission: 'Find your platform for the train to Seoul',
+    hint: { teammateId: 'haruto', text: '３番線に行ってください (San-bansen ni itte kudasai)', translation: 'Please go to platform 3' },
+    question: 'Which platform?',
+    choices: [
+      { id: 'a', label: 'Platform 1', color: '#5b8def' },
+      { id: 'b', label: 'Platform 2', color: '#4caf7d' },
+      { id: 'c', label: 'Platform 3', color: '#e2574c' },
     ],
+    answerId: 'c',
+    reward: { coins: 40, item: 'kimchi' },
   },
 ]
 
-export const SECONDS_PER_QUESTION = 10
-export const COINS_PER_CORRECT_ANSWER = 15
-export const BATTLE_WIN_BONUS = 50
-// Win condition: get at least this many correct out of BATTLE_QUESTIONS.length
+export const SECONDS_PER_ROUND = 30
+// Win condition: get at least this many correct out of BATTLE_ROUNDS.length
 export const BATTLE_WIN_THRESHOLD = 3
+export const BATTLE_WIN_BONUS = 50
 
-export const SHOP_ITEMS = [
-  { id: 'hat_cap', name: 'Backwards Cap', emoji: '🧢', category: 'Hat', price: 40 },
-  { id: 'hat_crown', name: 'Tiny Crown', emoji: '👑', category: 'Hat', price: 120 },
-  { id: 'hat_flower', name: 'Flower Crown', emoji: '🌸', category: 'Hat', price: 60 },
-  { id: 'face_glasses', name: 'Cool Shades', emoji: '🕶️', category: 'Face', price: 50 },
-  { id: 'face_mask', name: 'Cute Mask', emoji: '😷', category: 'Face', price: 25 },
-  { id: 'pet_cat', name: 'Pixel Cat', emoji: '🐱', category: 'Pet', price: 80 },
-  { id: 'pet_dog', name: 'Pixel Dog', emoji: '🐶', category: 'Pet', price: 80 },
-  { id: 'pet_dragon', name: 'Baby Dragon', emoji: '🐲', category: 'Pet', price: 150 },
-  { id: 'bg_beach', name: 'Beach Background', emoji: '🏖️', category: 'Background', price: 70 },
-  { id: 'bg_space', name: 'Space Background', emoji: '🌌', category: 'Background', price: 90 },
+// "Collect the World" — cosmetic/collectible items tied to real cultures.
+// Battle rounds can award one of these directly (see BATTLE_ROUNDS[].reward.item);
+// anything not yet won can also be bought with coins here.
+export const CULTURE_ITEMS = [
+  { id: 'paper_fan', name: 'Paper Fan', emoji: '🪭', country: 'Japan', price: 40 },
+  { id: 'croissant', name: 'Croissant', emoji: '🥐', country: 'France', price: 35 },
+  { id: 'red_bus', name: 'Red Bus', emoji: '🚌', country: 'United Kingdom', price: 45 },
+  { id: 'taco', name: 'Taco', emoji: '🌮', country: 'Mexico', price: 35 },
+  { id: 'kimchi', name: 'Kimchi', emoji: '🥬', country: 'South Korea', price: 45 },
+  { id: 'paella', name: 'Paella', emoji: '🥘', country: 'Spain', price: 50 },
+  { id: 'gondola', name: 'Gondola', emoji: '🛶', country: 'Italy', price: 60 },
+  { id: 'maple_leaf', name: 'Maple Leaf', emoji: '🍁', country: 'Canada', price: 30 },
 ]
 
 export const STARTING_COINS = 120
