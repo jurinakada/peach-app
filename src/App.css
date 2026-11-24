@@ -324,7 +324,7 @@
   color: var(--accent);
 }
 
-.village {
+.village3d-wrap {
   position: relative;
   flex: 1;
   min-height: 420px;
@@ -332,61 +332,72 @@
   overflow: hidden;
   border: 1px solid var(--card-border);
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
 }
 
-.village-ground {
+.village3d-canvas-box {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
 }
 
-.village-decor {
+.labels-overlay {
   position: absolute;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  line-height: 1;
-  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.15));
-}
-
-.room-avatar-btn {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  background: none;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
-  transition: left 0.35s ease, top 0.35s ease;
-}
-
-.villager-shadow {
-  position: absolute;
-  top: 46px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 34px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.18);
-}
-
-.room-me {
+  inset: 0;
   pointer-events: none;
 }
 
-.online-dot {
+.label-chip {
   position: absolute;
   top: 0;
-  right: 6px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--green);
-  border: 2px solid var(--card);
+  left: 0;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.village3d-wrap canvas {
+  touch-action: none;
+  display: block;
+}
+
+.dpad {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 112px;
+  height: 112px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.dpad-btn {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 16px;
+  touch-action: none;
+  user-select: none;
+}
+
+.dpad-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.dpad-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.dpad-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.dpad-down {
+  grid-column: 2;
+  grid-row: 3;
 }
 
 .room-name {

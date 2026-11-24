@@ -16,9 +16,10 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
 0. **Onboarding** — shown once on first load: a splash carousel followed by a welcome reward
    (bonus coins + a starter collectible). Resets if you clear the browser's localStorage.
 1. **Lobby** (`/`) — "Talk with your AI Partner" and "Your Study Plan" cards up top, and below
-   them a small walkable village (grass, a winding path, a pond, trees and flowers —
-   Animal-Crossing-flavored, not a literal copy). Tap the ground (or use arrow keys/WASD) to
-   walk your character around; tap another avatar to open a text chat with that person.
+   them a real 3D virtual world (`src/components/Village3D.jsx`, built with
+   `@react-three/fiber`/Three.js): grass, a pond, trees and flowers, with a third-person chase
+   camera. Move with arrow keys/WASD (desktop) or the on-screen D-pad (touch); tap another
+   character's body or name tag to open a text chat with them.
 2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": choose a
    language (Spanish or English) via tabs, then pick any real-life practice topic (Everyday
    Chat, Ordering Food, Asking Directions) with no restrictions — a ✓ marks ones you've
@@ -70,4 +71,8 @@ center itself in a phone-shaped frame on wider screens.
 ## Tech
 
 React + Vite, `react-router-dom` (HashRouter), plain CSS (no UI framework) with a peach
-color theme defined in `src/App.css`.
+color theme defined in `src/App.css`. The Lobby's 3D world uses `three` +
+`@react-three/fiber` directly — name tags are a hand-rolled world-to-screen projection
+overlay (`LabelProjector`/`LabelOverlay` in `Village3D.jsx`) rather than `@react-three/drei`'s
+`<Html>`, which has a known bug where one of several simultaneous instances can silently fail
+to mount.
