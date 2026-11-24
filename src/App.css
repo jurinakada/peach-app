@@ -189,6 +189,141 @@
   color: var(--ink-soft);
 }
 
+.study-plan-icon {
+  font-size: 28px;
+  width: 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ---------- AI partner scenario picker ---------- */
+
+.scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scenario-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.scenario-icon {
+  font-size: 26px;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.scenario-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.scenario-card-text strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.scenario-card-text span {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.scenario-done {
+  color: var(--green);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* ---------- study plan ---------- */
+
+.plan-banner {
+  background: var(--accent-soft);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.plan-banner p {
+  margin: 4px 0 0;
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lesson-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.lesson-row.locked {
+  opacity: 0.55;
+}
+
+.lesson-step {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lesson-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.lesson-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.lesson-text strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.lesson-text span {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.lesson-status {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
 .room {
   position: relative;
   flex: 1;

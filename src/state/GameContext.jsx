@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { STARTING_COINS } from '../mockData'
 
-const STORAGE_KEY = 'peach-game-state-v2'
+const STORAGE_KEY = 'peach-game-state-v3'
 
 const GameContext = createContext(null)
 
@@ -12,7 +12,7 @@ function loadInitialState() {
   } catch {
     // ignore corrupt storage, fall back to defaults
   }
-  return { coins: STARTING_COINS, owned: [] }
+  return { coins: STARTING_COINS, owned: [], completedScenarios: [] }
 }
 
 export function GameProvider({ children }) {
@@ -44,7 +44,16 @@ export function GameProvider({ children }) {
     })
   }
 
-  const value = { ...state, earnCoins, collectItem, buyItem }
+  // Marks an AI Partner scenario finished — drives Study Plan lesson unlocks.
+  function completeScenario(scenarioId) {
+    setState((prev) =>
+      prev.completedScenarios.includes(scenarioId)
+        ? prev
+        : { ...prev, completedScenarios: [...prev.completedScenarios, scenarioId] }
+    )
+  }
+
+  const value = { ...state, earnCoins, collectItem, buyItem, completeScenario }
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>
 }
 

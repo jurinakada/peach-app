@@ -15,34 +15,41 @@ allows (see `src/mockData.js` for exactly what's scripted vs. a stand-in for a r
 
 0. **Onboarding** — shown once on first load: a splash carousel followed by a welcome reward
    (bonus coins + a starter collectible). Resets if you clear the browser's localStorage.
-1. **Lobby** (`/`) — a "Talk with your AI Partner" card up top, and below it a 2D room with
-   human avatars. Tap an avatar to open a text chat with that person.
-2. **AI Partner** (`/ai-partner`) — your one, always-available scripted voice-practice
-   session. Tap the mic ("Hold to talk") to "speak" your next line; it reveals a transcribed
-   reply with a Pronunciation Coach score + tip, then the partner's response (with
+1. **Lobby** (`/`) — "Talk with your AI Partner" and "Your Study Plan" cards up top, and below
+   them a 2D room with human avatars. Tap an avatar to open a text chat with that person.
+2. **AI Partner picker** (`/ai-partner`) — "Talk with an AI partner any time": pick any
+   real-life practice topic (Everyday Chat, Ordering Food, Asking Directions) with no
+   restrictions — a ✓ marks ones you've already completed.
+3. **AI Partner session** (`/ai-partner/:scenarioId`) — a scripted voice-practice session for
+   the chosen topic. Tap the mic ("Hold to talk") to "speak" your next line; it reveals a
+   transcribed reply with a Pronunciation Coach score + tip, then the partner's response (with
    translation). Replies containing slang or a cultural reference show a "✨ Smart Chat" chip;
    tapping it reveals an "AI culture note" card. Explanations come from a hardcoded dictionary
    — see `src/ai/explain.js` for the stub where a real LLM/STT call would go.
-3. **Chat** (`/chat/:userId`) — HelloTalk-style typed chat with a real human contact. Messages
+4. **Study Plan** (`/study-plan`) — "lessons fit your level and goals": the same three
+   scenarios as a guided, ordered path — each lesson unlocks only once the one before it is
+   completed.
+5. **Chat** (`/chat/:userId`) — HelloTalk-style typed chat with a real human contact. Messages
    containing slang or a cultural reference show a "✨ AI explains" chip that reveals the same
    kind of culture-note card.
-4. **Battle** (`/battle`) — Team Peach (you + 2 human teammates from other countries) races
+6. **Battle** (`/battle`) — Team Peach (you + 2 human teammates from other countries) races
    Team Plum through 5 narrative mission rounds against a 30-second timer. Each round shows
    one hint in a rotating teammate's native language — "your teammates' language becomes your
    hint" — plus a lettered multiple-choice answer. Correct answers pay out coins live and
    unlock a themed collectible item immediately.
-5. **Shop** (`/shop`) — "Collect the World": spend coins on cultural collectible items (each
+7. **Shop** (`/shop`) — "Collect the World": spend coins on cultural collectible items (each
    tied to a country) or see the ones you've already won in Battle marked "Owned".
 
 ## Mock data
 
 Everything editable lives in **`src/mockData.js`**: the human lobby contacts + their typed
-conversations, the single `AI_PARTNER`'s scripted turns (translations, pronunciation scores),
-the slang/cultural-reference dictionary, battle mission rounds (hints, choices, rewards), and
+conversations, the `AI_PARTNER_PROFILE` + `AI_PARTNER_SCENARIOS` (scripted turns, translations,
+pronunciation scores — also what drives the Study Plan's lesson list), the
+slang/cultural-reference dictionary, battle mission rounds (hints, choices, rewards), and
 culture items. Edit that one file to change content without touching any component code.
 
-Coins and owned items persist to `localStorage` so progress survives a refresh
-(`src/state/GameContext.jsx`).
+Coins, owned items, and completed AI Partner scenarios persist to `localStorage` so progress
+survives a refresh (`src/state/GameContext.jsx`).
 
 ## Running locally
 

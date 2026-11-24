@@ -1,26 +1,47 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { AI_PARTNER } from '../mockData'
+import { useNavigate, useParams } from 'react-router-dom'
+import { AI_PARTNER_PROFILE, AI_PARTNER_SCENARIOS } from '../mockData'
 import { detectSlang, explainText } from '../ai/explain'
 import Avatar from '../components/Avatar'
+import { useGame } from '../state/GameContext'
 
-// Your one AI conversation partner: a scripted voice-practice session.
-// Tapping the mic "speaks" your next line (with a pronunciation score), then
-// the partner replies in turn. This mirrors a voice conversation without
-// needing real speech recognition — swap handleMicTap's timeouts for a real
-// STT/LLM round trip later.
+// Your one AI conversation partner, running a scripted voice-practice
+// session for whichever scenario was picked. Tapping the mic "speaks" your
+// next line (with a pronunciation score), then the partner replies in turn.
+// This mirrors a voice conversation without needing real speech recognition
+// — swap handleMicTap's timeouts for a real STT/LLM round trip later.
 export default function AIPartner() {
+  const { scenarioId } = useParams()
   const navigate = useNavigate()
-  const turns = AI_PARTNER.turns
+  const { completeScenario } = useGame()
+  const scenario = AI_PARTNER_SCENARIOS.find((s) => s.id === scenarioId)
+  const turns = scenario?.turns ?? []
 
   const [revealedCount, setRevealedCount] = useState(Math.min(1, turns.length))
   const [status, setStatus] = useState('idle') // 'idle' | 'listening'
   const [explanations, setExplanations] = useState({}) // turnIndex -> result | 'loading'
   const micTimeouts = useRef([])
+  const completed = useRef(false)
 
   useEffect(() => () => micTimeouts.current.forEach(clearTimeout), [])
 
-  const done = revealedCount >= turns.length
+  const done = turns.length > 0 && revealedCount >= turns.length
+
+  useEffect(() => {
+    if (done && !completed.current) {
+      completed.current = true
+      completeScenario(scenario.id)
+    }
+  }, [done, scenario, completeScenario])
+
+  if (!scenario) {
+    return (
+      <div className="screen">
+        <p>Unknown scenario.</p>
+        <button onClick={() => navigate('/ai-partner')}>Back to practice topics</button>
+      </div>
+    )
+  }
 
   function handleMicTap() {
     if (status === 'listening' || done) return
@@ -50,12 +71,12 @@ export default function AIPartner() {
   return (
     <div className="screen chat-screen">
       <header className="screen-header chat-header">
-        <Avatar emoji={AI_PARTNER.emoji} color={AI_PARTNER.color} size={36} />
+        <Avatar emoji={AI_PARTNER_PROFILE.emoji} color={AI_PARTNER_PROFILE.color} size={36} />
         <div className="chat-header-text">
-          <strong>{AI_PARTNER.lang} · AI Partner</strong>
-          <span className="label-caps">Topic · {AI_PARTNER.topic}</span>
+          <strong>{AI_PARTNER_PROFILE.lang} · AI Partner</strong>
+          <span className="label-caps">Topic · {scenario.topic}</span>
         </div>
-        <button className="close-btn" onClick={() => navigate('/')}>
+        <button className="close-btn" onClick={() => navigate('/ai-partner')}>
           ✕
         </button>
       </header>
